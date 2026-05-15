@@ -1,1 +1,65 @@
-<!DOCTYPE html> <html> <head> <title>Game</title> </head> <body style="background:black;color:white;"> <h1>Game Running ✅</h1> </body> </html>
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Multiplayer Game</title>
+
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body style="margin:0;overflow:hidden;background:black;">
+
+<canvas id="game"></canvas>
+
+<script>
+
+const socket = io();
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let player = {
+  x: 100,
+  y: 100
+};
+
+let players = {};
+
+document.addEventListener("keydown", (e) => {
+
+  if(e.key === "w") player.y -= 10;
+  if(e.key === "s") player.y += 10;
+  if(e.key === "a") player.x -= 10;
+  if(e.key === "d") player.x += 10;
+
+  socket.emit("move", player);
+
+});
+
+socket.on("players", (serverPlayers) => {
+  players = serverPlayers;
+});
+
+function gameLoop(){
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  for(let id in players){
+
+    ctx.fillStyle = "lime";
+    ctx.fillRect(players[id].x, players[id].y, 50, 50);
+
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+
+</script>
+
+</body>
+</html>
